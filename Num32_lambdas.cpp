@@ -10,34 +10,6 @@ struct Lambda
   }
 };
 
-int factorial(int num)
-{
-  if(num == 0 || num == 1)
-    return 1;
-
-  return num*factorial(num-1);
-}
-
-int fib_recursive(int num)
-{
-  if( num == 0 || num == 1 )
-    return 1;
-
-   return fib_recursive(num-1) + fib_recursive(num-2);
-}
-
-int fib(int num)
-{
-  auto n = [r = 0, s = 1]() mutable {
-    r = std::exchange(s, s+r);
-    return r;
-  };
-
-  for( int i = 0; i < num; ++i ) { n(); }
-
-  return n();
-}
-
 int main()
 {
   int i = 1;
@@ -47,29 +19,27 @@ int main()
 
   // mutable keyword required because i passed by value
   // Parenthesis also required in this case
-  //auto l = [i] () mutable { return ++i; };
+  auto l = [i] () mutable { return ++i; };
 
   // Creating and mutating variable inside lambda
   // Count of how many times lambda is called
-  auto l = [j = 0] () mutable { return ++j; };
+  auto m = [j = 0] () mutable { return ++j; };
+  
+  auto n = []{ return 5; }();
 
-  //return []{ return 5; }();
-  //return Lambda()();
-  l();
-  l();
-  l();
-  std::cout << "l = " << l() << "\n"; // Prints "4"
+  auto o = []{ return 5; };
+ 
+  // Create and invoke in the same expression
+  std::cout << Lambda()() << "\n";
 
-  auto m = [q = 0, p = std::make_unique<int>(2)] () mutable { return ++q; };
-  m();
-  m();
-  std::cout << "m = " << m() << "\n"; // Prints "3"
+  // Parenthesis required
+  std::cout << m() << "\n";
 
-  std::cout << "fib = " << fib(11) << "\n"; //Prints "144"
+  // Parenthesis not allowed since are included in lambda definition
+  std::cout << n << "\n";
 
-  std::cout << "fib_recursive = " << fib_recursive(11) << "\n"; //Prints "144"
+  // Parenthesis required
+  std::cout << o() << "\n";
 
-  std::cout << "factorial = " << factorial(5) << "\n"; //Prints "120"
-
-  return l();
+  return []{ return 5; }();
 }
